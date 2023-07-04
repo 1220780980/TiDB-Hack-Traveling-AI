@@ -1,4 +1,5 @@
 package com.example.tripadvisor.model;
+import java.time.Duration;
 
 public class Attraction extends Content {
 

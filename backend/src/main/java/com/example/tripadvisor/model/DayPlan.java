@@ -1,4 +1,5 @@
 package com.example.tripadvisor.model;
+import java.util.List;
 
 public class DayPlan {
 

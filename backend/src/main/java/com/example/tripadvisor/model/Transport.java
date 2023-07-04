@@ -1,4 +1,6 @@
 package com.example.tripadvisor.model;
+import java.time.Duration;
+import java.util.List;
 
 public class Transport extends Content {
 
