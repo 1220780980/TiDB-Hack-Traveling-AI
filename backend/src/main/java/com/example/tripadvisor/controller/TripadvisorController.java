@@ -3,6 +3,7 @@ package com.example.tripadvisor.controller;
 import com.example.tripadvisor.dataAccessObject.AttractionGetter;
 import com.example.tripadvisor.dataAccessObject.PlanGetter;
 import com.example.tripadvisor.model.Attraction;
+import com.example.tripadvisor.model.WeatherGetter;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,5 +40,7 @@ public class TripadvisorController {
             JSONObject jsonObject = new JSONObject(plan);
             plans.add(jsonObject);
         }
+        // TODO
+        WeatherGetter weatherGetter = new WeatherGetter(country, city, startDate, leaveDate);
     }
 }
