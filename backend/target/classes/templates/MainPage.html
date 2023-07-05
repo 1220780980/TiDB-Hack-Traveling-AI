@@ -22,12 +22,12 @@
     <br>
     <div id="checkboxes"></div>
     <br>
-    <label for="dateInput">Start date:</label>
+    <label>Start date:</label>
     <input type="date" id="startDate" name="dateInput">
     <br>
-    <label for="dateInput">Leave date:</label>
+    <label>Leave date:</label>
     <input type="date" id="leaveDate" name="dateInput">
-    <form id="formSubmit" action="" method="POST">
+    <form id="formSubmit" action="/templates/MainPage.html" method="POST">
         <input type="hidden" name="country" id="countryInput">
         <input type="hidden" name="city" id="cityInput">
         <input type="hidden" name="startDate" id="startDateInput">
@@ -115,9 +115,12 @@
             // send post request
             let xhr = new XMLHttpRequest();
             xhr.open(form.method, form.action);
-            xhr.onload = function () {
-
-            };
+            // xhr.onload = function () {
+            //     alert(xhr.responseText);
+            // };
+            // xhr.onerror = function () {
+            //     alert(xhr.responseText);
+            // };
             let formData = new FormData(form);
             xhr.send(formData);
         }
