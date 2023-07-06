@@ -3,8 +3,7 @@ package com.example.tripadvisor.controller;
 import com.example.tripadvisor.dataAccessObject.AttractionGetter;
 import com.example.tripadvisor.dataAccessObject.PlanGetter;
 import com.example.tripadvisor.model.Attraction;
-import com.example.tripadvisor.model.WeatherGetter;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.example.tripadvisor.model.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +26,7 @@ public class TripadvisorController {
 
     @GetMapping(value="/MainPage")
     public String MainPage() {
+
         return "MainPage";
     }
 
@@ -40,7 +40,11 @@ public class TripadvisorController {
             JSONObject jsonObject = new JSONObject(plan);
             plans.add(jsonObject);
         }
-        // TODO
-        WeatherGetter weatherGetter = new WeatherGetter(country, city, startDate, leaveDate);
+
+        Weather weather = new Weather(country, city, startDate, leaveDate);
+        List<String>ListWeather = weather.getListWeather();
+
+        //--------test---------//
+        System.out.println(ListWeather);
     }
 }
