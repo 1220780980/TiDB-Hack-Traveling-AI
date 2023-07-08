@@ -2,11 +2,13 @@ package com.example.tripadvisor.controller;
 
 import com.example.tripadvisor.dataAccessObject.AttractionGetter;
 import com.example.tripadvisor.dataAccessObject.PlanGetter;
+import com.example.tripadvisor.dataAccessObject.WeatherAPIGetter;
 import com.example.tripadvisor.model.Attraction;
 import com.example.tripadvisor.model.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import com.example.tripadvisor.model.WeatherAPI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +44,10 @@ public class TripadvisorController {
         }
 
         Weather weather = new Weather(country, city, startDate, leaveDate);
-        List<String>ListWeather = weather.getListWeather();
+        WeatherAPI getWeatherResult = weather.getListWeather();
 
         //--------test---------//
-        System.out.println(ListWeather);
+        System.out.println(getWeatherResult.getTripWeather());
+        System.out.println(getWeatherResult.getTripWeatherGoodOrNot());
     }
 }

@@ -14,7 +14,7 @@ public class Weather {
     private final LocalDate startDate;
     private final LocalDate leaveDate;
 
-    private final List<String> ListWeather;
+    private final WeatherAPI ListWeather;
 
 
     public Weather(String country, String city, String startDate, String leaveDate) {
@@ -43,7 +43,7 @@ public class Weather {
         return leaveDate;
     }
 
-    public List<String> getListWeather() {
+    public WeatherAPI getListWeather() {
         return ListWeather;
     }
 
