@@ -20,8 +20,6 @@ public class WeatherAPIGetter {
     }
 
     public WeatherAPI getWeatherAPI(String city, String country, LocalDate startDate, LocalDate leaveDate) {
-        System.out.println(startDate);
-        System.out.println(leaveDate);
         String url = "https://api.weatherbit.io/v2.0/forecast/daily?&city=" + city + "&country=" + country + "&key=53e98c76f295400283d0adc75be14068";
         String jsonResponse = restTemplate.getForObject(url, String.class);
         List<String> dateTimes = JsonPath.parse(jsonResponse).read("$.data[*].datetime");
