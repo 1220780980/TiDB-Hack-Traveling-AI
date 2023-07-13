@@ -53,6 +53,9 @@ public class TripadvisorController {
                                   @RequestParam("startDate") String startDate, @RequestParam("leaveDate") String leaveDate,
                                   @RequestParam("daily") String dailyHours) {
         List<Attraction> attractions = attractionGetter.getAttraction(country, city);
+        Duration leftDuration = Duration.ofMinutes(Integer.parseInt(dailyHours) * 60);
+        attractions.removeIf(a -> a.getRecommendDuration().toMillis() > leftDuration.toMillis());
+
         List<String> plansString = planGetter.getPlan(country, city);
         List<Transportation> transportations = transportationGetter.getTransportation(country, city);
         List<JSONObject> plans = new ArrayList<>();
@@ -82,10 +85,14 @@ public class TripadvisorController {
                                       Duration.ofMinutes(0), a.getRecommendDuration(),
                                       WeatherIndoorOutdoor);
                     rows.add(row);
-                    // TODO: find best attraction, add it to plan, remove it from attraction list
                 }
+                int best = findBestAttractionNewDay(rows);
+                Attraction bestAttraction = findAttraction(attractions, best);
+                contents.add(bestAttraction);
+                attractions.removeIf(a -> bestAttraction.getNum() == a.getNum());
             } else {
                 newDay = false;
+                // TODO: similar to above
             }
 
             DayPlan dayPlan = new DayPlan(i, contents);
@@ -95,6 +102,27 @@ public class TripadvisorController {
         ResultPlan resultPlan = new ResultPlan(dayPlanList);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultPlan);
+    }
+
+    private Attraction findAttraction(List<Attraction> attractions, int best) {
+        for (Attraction a : attractions) {
+            if (a.getNum() == best) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    private int findBestAttractionNewDay(List<Row> rows) {
+        int largestOccurrence = 0;
+        int bestAttraction = -1;
+        for (Row r : rows) {
+            if (r.getWeatherIndoorOutdoor() && (r.getTotalOccurrence() > largestOccurrence)) {
+                largestOccurrence = r.getTotalOccurrence();
+                bestAttraction = r.getAttractions();
+            }
+        }
+        return bestAttraction;
     }
 
     private int findTotalOccurrence(Attraction attraction, List<JSONObject> plans) {

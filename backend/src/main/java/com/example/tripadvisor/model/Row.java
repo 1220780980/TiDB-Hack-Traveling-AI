@@ -18,4 +18,28 @@ public class Row {
         this.AttractionVisitTime = AttractionVisitTime;
         this.WeatherIndoorOutdoor = WeatherIndoorOutdoor;
     }
+
+    public int getAttractions() {
+        return Attractions;
+    }
+
+    public Boolean getWeatherIndoorOutdoor() {
+        return WeatherIndoorOutdoor;
+    }
+
+    public Duration getAttractionVisitTime() {
+        return AttractionVisitTime;
+    }
+
+    public Duration getTransportationTime() {
+        return TransportationTime;
+    }
+
+    public int getOccurrenceNextToLast() {
+        return OccurrenceNextToLast;
+    }
+
+    public int getTotalOccurrence() {
+        return TotalOccurrence;
+    }
 }
