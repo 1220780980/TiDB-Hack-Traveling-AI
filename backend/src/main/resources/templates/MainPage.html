@@ -138,9 +138,14 @@
             // send post request
             let xhr = new XMLHttpRequest();
             xhr.open(form.method, form.action);
-            // xhr.onload = function () {
-            //     alert(xhr.responseText);
-            // };
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    let responseJson = JSON.parse(xhr.responseText);
+                    console.log(responseJson);
+                } else {
+                    console.error('请求失败: ' + xhr.status);
+                }
+            };
             // xhr.onerror = function () {
             //     alert(xhr.responseText);
             // };

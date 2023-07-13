@@ -1,5 +1,5 @@
 package com.example.tripadvisor.model;
 
-abstract class Content {
+abstract public class Content {
 
 }
