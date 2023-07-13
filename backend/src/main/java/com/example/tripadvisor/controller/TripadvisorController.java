@@ -38,7 +38,8 @@ public class TripadvisorController {
 
     @PostMapping("/MainPage")
     public void handlePostRequest(@RequestParam("country") String country, @RequestParam("city") String city,
-                                  @RequestParam("startDate") String startDate, @RequestParam("leaveDate") String leaveDate) {
+                                  @RequestParam("startDate") String startDate, @RequestParam("leaveDate") String leaveDate,
+                                  @RequestParam("daily") String dailyHours) {
         List<Attraction> attractions = attractionGetter.getAttraction(country, city);
         List<String> plansString = planGetter.getPlan(country, city);
         List<Transportation> transportations = transportationGetter.getTransportation(country, city);
@@ -50,9 +51,6 @@ public class TripadvisorController {
 
         Weather weather = new Weather(country, city, startDate, leaveDate);
         WeatherAPI getWeatherResult = weather.getListWeather();
-
-        //--------test---------//
-        // System.out.println(getWeatherResult.getTripWeather());
-        // System.out.println(getWeatherResult.getTripWeatherGoodOrNot());
+        List<Boolean> weatherList = getWeatherResult.getTripWeatherGoodOrNot();
     }
 }
