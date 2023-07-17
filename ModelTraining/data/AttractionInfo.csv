@@ -1,0 +1,37 @@
+country,city,num,name,indoor_outdoor,suggestion_time
+UK,London,1,Big Ben,0,90
+UK,London,2,Westminster Abbey,1,120
+UK,London,3,Buckingham Palace,0,120
+UK,London,4,Tower Bridge,0,90
+UK,London,5,The Shard,1,90
+UK,London,6,Royal Observatory Greenwich,0,60
+UK,London,7,River Thames,0,120
+UK,London,8,The National Gallery,1,210
+UK,London,9,St. Paul's Cathedral,1,120
+UK,London,10,Shakespeare's Globe Theater,1,40
+UK,London,11,Kensington Palace,1,120
+UK,London,12,Harrods,1,120
+UK,London,13,The British Museum,1,240
+UK,London,14,Trafalgar Square,0,30
+UK,London,15,Bicester Village,1,210
+UK,London,16,Russell Square,0,60
+UK,London,17,Charing Cross Road,0,90
+UK,London,18,London Eye,1,30
+UK,London,19,St. James's Park,0,60
+UK,London,20,Hyde Park,0,120
+UK,London,21,Windsor Castle,1,120
+UK,London,22,University of Oxford,0,600
+UK,London,23,University of Cambridge,0,600
+UK,London,24,Westgate Gardens,0,90
+UK,London,25,White Cliffs of Dover,0,180
+UK,London,26,Stonehenge,0,150
+UK,London,27,Leeds Castle,1,120
+UK,London,28,Canterbury Cathedral,1,120
+UK,London,29,Covent Garden,0,120
+UK,London,30,China Town,0,30
+UK,London,31,Warner Bros. Studio Tour,1,180
+UK,London,32,King鈥檚 Cross,1,60
+UK,London,33,Natural History Museum,1,150
+UK,London,34,Downing Street,0,20
+UK,London,35,Queen Mary's Gardens,0,90
+UK,London,36,Sherlock Holmes Museum,1,45
