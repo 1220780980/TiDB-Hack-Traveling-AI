@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 import joblib
-
+from sklearn2pmml import PMMLPipeline, sklearn2pmml
 
 attractionInfo = pd.read_csv("data/AttractionInfo.csv")
 detailedPlan = pd.read_csv("data/DetailedPlan.csv")
@@ -103,7 +103,12 @@ model = LogisticRegression(max_iter=3000, multi_class="multinomial", solver="lbf
 model.fit(X_train, y_train)
 filename = "models/logistic_regression_model.joblib"
 joblib.dump(model, filename)
-print(model.predict(X_valid))
+
+# pipeline = PMMLPipeline([("model", LogisticRegression(max_iter=3000, multi_class="multinomial", solver="lbfgs"))])
+# pipeline.fit(X_train, y_train)
+# filename = "models/logistic_regression_model.pmml"
+# sklearn2pmml(pipeline, filename)
+# print(1)
 
 # decision tree
 depths = [3, 5, 7, 9, 11]
@@ -125,7 +130,12 @@ best_model = DecisionTreeClassifier(max_depth=best_depth)
 best_model.fit(X_train, y_train)
 filename = "models/decision_tree_model.joblib"
 joblib.dump(best_model, filename)
-print(best_model.predict(X_valid))
+
+# pipeline = PMMLPipeline([("model", DecisionTreeClassifier(max_depth=best_depth))])
+# pipeline.fit(X_train, y_train)
+# filename = "models/decision_tree_model.pmml"
+# sklearn2pmml(pipeline, filename, with_repr=True)
+# print(1)
 
 # random forest
 param_grid = {
@@ -162,7 +172,12 @@ best_model = RandomForestClassifier(**best_params)
 best_model.fit(X_train, y_train)
 filename = "models/random_forest_model.joblib"
 joblib.dump(best_model, filename)
-print(best_model.predict(X_valid))
+
+# pipeline = PMMLPipeline([("model", RandomForestClassifier(**best_params))])
+# pipeline.fit(X_train, y_train)
+# filename = "models/random_forest_model.pmml"
+# sklearn2pmml(pipeline, filename, with_repr=True)
+# print(1)
 
 # knn
 n_neighbors_values = [3, 5, 7, 9, 11]
@@ -183,7 +198,12 @@ best_knn_classifier = KNeighborsClassifier(n_neighbors=best_n_neighbors)
 best_knn_classifier.fit(X_train, y_train)
 filename = "models/knn_model.joblib"
 joblib.dump(best_knn_classifier, filename)
-print(best_knn_classifier.predict(X_valid))
+
+# pipeline = PMMLPipeline([("model", KNeighborsClassifier(n_neighbors=best_n_neighbors))])
+# pipeline.fit(X_train, y_train)
+# filename = "models/knn_model.pmml"
+# sklearn2pmml(pipeline, filename, with_repr=True)
+# print(1)
 
 # svm
 C_values = [0.1, 1, 10]
@@ -208,5 +228,9 @@ best_svm_classifier = SVC(C=best_C, kernel=best_kernel)
 best_svm_classifier.fit(X_train, y_train)
 filename = "models/svm_model.joblib"
 joblib.dump(best_svm_classifier, filename)
-print(best_svm_classifier.predict(X_valid))
-print(y_valid)
+
+pipeline = PMMLPipeline([("model", SVC(C=best_C, kernel=best_kernel))])
+pipeline.fit(X_train, y_train)
+filename = "models/svm_model.pmml"
+sklearn2pmml(pipeline, filename, with_repr=True)
+print(1)
