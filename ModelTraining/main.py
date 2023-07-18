@@ -2,6 +2,14 @@ import pandas as pd
 import numpy as np
 import json
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+import joblib
+
 
 attractionInfo = pd.read_csv("data/AttractionInfo.csv")
 detailedPlan = pd.read_csv("data/DetailedPlan.csv")
@@ -88,14 +96,117 @@ trainingData["score"] = linear_scaling(trainingData["score"])
 X = trainingData.iloc[:, :-1]
 y = trainingData.iloc[:, -1]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.15, random_state=42)
 
-# 打印划分后的数据集大小
-print("训练集大小:", X_train.shape)
-print("测试集大小:", X_test.shape)
+# logistic regression
+model = LogisticRegression(max_iter=3000, multi_class="multinomial", solver="lbfgs")
+model.fit(X_train, y_train)
+filename = "models/logistic_regression_model.joblib"
+joblib.dump(model, filename)
+print(model.predict(X_valid))
 
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
-# pd.set_option('display.width', None)
-#
-# print(trainingData)
+# decision tree
+depths = [3, 5, 7, 9, 11]
+
+best_depth = None
+best_accuracy = 0.0
+
+for depth in depths:
+    model = DecisionTreeClassifier(max_depth=depth)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_valid)
+    accuracy = accuracy_score(y_valid, y_pred)
+
+    if accuracy > best_accuracy:
+        best_accuracy = accuracy
+        best_depth = depth
+
+best_model = DecisionTreeClassifier(max_depth=best_depth)
+best_model.fit(X_train, y_train)
+filename = "models/decision_tree_model.joblib"
+joblib.dump(best_model, filename)
+print(best_model.predict(X_valid))
+
+# random forest
+param_grid = {
+    'n_estimators': [10, 20, 50, 100, 200, 300],
+    'max_depth': [None, 5, 10, 15],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+model = RandomForestClassifier()
+best_params = None
+best_accuracy = 0.0
+
+for n_estimators in param_grid['n_estimators']:
+    for max_depth in param_grid['max_depth']:
+        for min_samples_split in param_grid['min_samples_split']:
+            for min_samples_leaf in param_grid['min_samples_leaf']:
+                model.set_params(n_estimators=n_estimators, max_depth=max_depth,
+                                 min_samples_split=min_samples_split,
+                                 min_samples_leaf=min_samples_leaf)
+                model.fit(X_train, y_train)
+                y_pred = model.predict(X_valid)
+                accuracy = accuracy_score(y_valid, y_pred)
+
+                if accuracy > best_accuracy:
+                    best_accuracy = accuracy
+                    best_params = {
+                        'n_estimators': n_estimators,
+                        'max_depth': max_depth,
+                        'min_samples_split': min_samples_split,
+                        'min_samples_leaf': min_samples_leaf
+                    }
+
+best_model = RandomForestClassifier(**best_params)
+best_model.fit(X_train, y_train)
+filename = "models/random_forest_model.joblib"
+joblib.dump(best_model, filename)
+print(best_model.predict(X_valid))
+
+# knn
+n_neighbors_values = [3, 5, 7, 9, 11]
+best_accuracy = 0.0
+best_n_neighbors = None
+
+for n_neighbors in n_neighbors_values:
+    knn_classifier = KNeighborsClassifier(n_neighbors=n_neighbors)
+    knn_classifier.fit(X_train, y_train)
+    y_pred = knn_classifier.predict(X_valid)
+    accuracy = accuracy_score(y_valid, y_pred)
+
+    if accuracy > best_accuracy:
+        best_accuracy = accuracy
+        best_n_neighbors = n_neighbors
+
+best_knn_classifier = KNeighborsClassifier(n_neighbors=best_n_neighbors)
+best_knn_classifier.fit(X_train, y_train)
+filename = "models/knn_model.joblib"
+joblib.dump(best_knn_classifier, filename)
+print(best_knn_classifier.predict(X_valid))
+
+# svm
+C_values = [0.1, 1, 10]
+kernel_values = ['linear', 'rbf']
+best_accuracy = 0.0
+best_C = None
+best_kernel = None
+
+for C in C_values:
+    for kernel in kernel_values:
+        svm_classifier = SVC(C=C, kernel=kernel)
+        svm_classifier.fit(X_train, y_train)
+        y_pred = svm_classifier.predict(X_valid)
+        accuracy = accuracy_score(y_valid, y_pred)
+
+        if accuracy > best_accuracy:
+            best_accuracy = accuracy
+            best_C = C
+            best_kernel = kernel
+
+best_svm_classifier = SVC(C=best_C, kernel=best_kernel)
+best_svm_classifier.fit(X_train, y_train)
+filename = "models/svm_model.joblib"
+joblib.dump(best_svm_classifier, filename)
+print(best_svm_classifier.predict(X_valid))
+print(y_valid)
