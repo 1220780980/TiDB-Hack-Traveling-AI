@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_4" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.4">
+	<Header>
+		<Application name="SkLearn2PMML package" version="0.95.0"/>
+		<Timestamp>2023-07-18T12:56:49Z</Timestamp>
+	</Header>
+	<DataDictionary>
+		<DataField name="score" optype="categorical" dataType="integer">
+			<Value value="1"/>
+			<Value value="2"/>
+			<Value value="3"/>
+			<Value value="4"/>
+			<Value value="5"/>
+			<Value value="6"/>
+			<Value value="7"/>
+			<Value value="8"/>
+			<Value value="9"/>
+			<Value value="10"/>
+		</DataField>
+		<DataField name="total_occurrence" optype="continuous" dataType="double"/>
+		<DataField name="neighbour_occurrence" optype="continuous" dataType="double"/>
+		<DataField name="transportation_time" optype="continuous" dataType="double"/>
+	</DataDictionary>
+	<RegressionModel functionName="classification" algorithmName="sklearn.linear_model._logistic.LogisticRegression" normalizationMethod="softmax">
+		<MiningSchema>
+			<MiningField name="score" usageType="target"/>
+			<MiningField name="total_occurrence"/>
+			<MiningField name="neighbour_occurrence"/>
+			<MiningField name="transportation_time"/>
+		</MiningSchema>
+		<Output>
+			<OutputField name="1" optype="continuous" dataType="double" feature="probability" value="1"/>
+			<OutputField name="2" optype="continuous" dataType="double" feature="probability" value="2"/>
+			<OutputField name="3" optype="continuous" dataType="double" feature="probability" value="3"/>
+			<OutputField name="4" optype="continuous" dataType="double" feature="probability" value="4"/>
+			<OutputField name="5" optype="continuous" dataType="double" feature="probability" value="5"/>
+			<OutputField name="6" optype="continuous" dataType="double" feature="probability" value="6"/>
+			<OutputField name="7" optype="continuous" dataType="double" feature="probability" value="7"/>
+			<OutputField name="8" optype="continuous" dataType="double" feature="probability" value="8"/>
+			<OutputField name="9" optype="continuous" dataType="double" feature="probability" value="9"/>
+			<OutputField name="10" optype="continuous" dataType="double" feature="probability" value="10"/>
+		</Output>
+		<RegressionTable intercept="3.6367719691573632" targetCategory="1">
+			<NumericPredictor name="total_occurrence" coefficient="-13.435794171184847"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="-3.577084332432312"/>
+			<NumericPredictor name="transportation_time" coefficient="0.11162635608176305"/>
+		</RegressionTable>
+		<RegressionTable intercept="1.9366656986424415" targetCategory="2">
+			<NumericPredictor name="total_occurrence" coefficient="-5.507703318896763"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="-2.8829153934012273"/>
+			<NumericPredictor name="transportation_time" coefficient="0.1116727468318411"/>
+		</RegressionTable>
+		<RegressionTable intercept="0.8427303242716044" targetCategory="3">
+			<NumericPredictor name="total_occurrence" coefficient="-0.4868599730532321"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="0.19920317046307087"/>
+			<NumericPredictor name="transportation_time" coefficient="0.1088552167794366"/>
+		</RegressionTable>
+		<RegressionTable intercept="-0.6048521024610667" targetCategory="4">
+			<NumericPredictor name="total_occurrence" coefficient="1.434227600513111"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="0.35736791740488827"/>
+			<NumericPredictor name="transportation_time" coefficient="0.10901532742296213"/>
+		</RegressionTable>
+		<RegressionTable intercept="-1.2533046127930152" targetCategory="5">
+			<NumericPredictor name="total_occurrence" coefficient="2.795890774761784"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="2.8767384866649364"/>
+			<NumericPredictor name="transportation_time" coefficient="0.1028333593077942"/>
+		</RegressionTable>
+		<RegressionTable intercept="-1.4096157322715253" targetCategory="6">
+			<NumericPredictor name="total_occurrence" coefficient="2.0463538413632825"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="1.3972236066709727"/>
+			<NumericPredictor name="transportation_time" coefficient="0.06357661504591793"/>
+		</RegressionTable>
+		<RegressionTable intercept="-4.606390123242404" targetCategory="7">
+			<NumericPredictor name="total_occurrence" coefficient="8.844196596031498"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="-1.189440638651764"/>
+			<NumericPredictor name="transportation_time" coefficient="0.10434829694619678"/>
+		</RegressionTable>
+		<RegressionTable intercept="1.322403666021245" targetCategory="8">
+			<NumericPredictor name="total_occurrence" coefficient="1.9025961491046044"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="0.6170815139566475"/>
+			<NumericPredictor name="transportation_time" coefficient="-0.24120316814810383"/>
+		</RegressionTable>
+		<RegressionTable intercept="-1.2776397029740718" targetCategory="9">
+			<NumericPredictor name="total_occurrence" coefficient="1.3735352292256624"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="1.2758111412194078"/>
+			<NumericPredictor name="transportation_time" coefficient="-0.02782018686396052"/>
+		</RegressionTable>
+		<RegressionTable intercept="1.4132306157160124" targetCategory="10">
+			<NumericPredictor name="total_occurrence" coefficient="1.0335572721173956"/>
+			<NumericPredictor name="neighbour_occurrence" coefficient="0.926014528114082"/>
+			<NumericPredictor name="transportation_time" coefficient="-0.4429045634032013"/>
+		</RegressionTable>
+	</RegressionModel>
+</PMML>

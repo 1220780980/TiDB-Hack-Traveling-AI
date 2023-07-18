@@ -3,30 +3,24 @@ package com.example.tripadvisor.controller;
 import com.example.tripadvisor.dataAccessObject.AttractionGetter;
 import com.example.tripadvisor.dataAccessObject.PlanGetter;
 import com.example.tripadvisor.dataAccessObject.TransportationGetter;
-import com.example.tripadvisor.dataAccessObject.WeatherAPIGetter;
 import com.example.tripadvisor.model.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
 import org.json.JSONObject;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
+
+import org.pmml4s.model.Model;
 
 @Controller
 public class TripadvisorController {
@@ -90,9 +84,47 @@ public class TripadvisorController {
                 Attraction bestAttraction = findAttraction(attractions, best);
                 contents.add(bestAttraction);
                 attractions.removeIf(a -> bestAttraction.getNum() == a.getNum());
-            } else {
                 newDay = false;
+            } else {
+                String path = System.getProperty("user.dir") + "/backend/src/main/java/com/example/tripadvisor/trained";
+                Model decision_tree = Model.fromFile(path + "/decision_tree_model.pmml");
+                Model knn = Model.fromFile(path + "/knn_model.pmml");
+                Model logistic_regression = Model.fromFile(path + "/logistic_regression_model.pmml");
+                Model random_forest = Model.fromFile(path + "/random_forest_model.pmml");
+                Model svm = Model.fromFile(path + "/svm_model.pmml");
+                String[] inputNames = decision_tree.inputNames();
+                Map<String, Object> result = decision_tree.predict(new HashMap<String, Object>() {{
+                    put("total_occurrence", 0.8);
+                    put("neighbour_occurrence", 0.7);
+                    put("transportation_time", 10.0);
+                }});
+                System.out.println(result);
+                result = knn.predict(new HashMap<String, Object>() {{
+                    put("total_occurrence", 0.8);
+                    put("neighbour_occurrence", 0.7);
+                    put("transportation_time", 10.0);
+                }});
+                System.out.println(result);
+                result = logistic_regression.predict(new HashMap<String, Object>() {{
+                    put("total_occurrence", 0.8);
+                    put("neighbour_occurrence", 0.7);
+                    put("transportation_time", 10.0);
+                }});
+                System.out.println(result);
+                result = random_forest.predict(new HashMap<String, Object>() {{
+                    put("total_occurrence", 0.8);
+                    put("neighbour_occurrence", 0.7);
+                    put("transportation_time", 10.0);
+                }});
+                System.out.println(result);
+                result = svm.predict(new HashMap<String, Object>() {{
+                    put("total_occurrence", 0.8);
+                    put("neighbour_occurrence", 0.7);
+                    put("transportation_time", 10.0);
+                }});
+                System.out.println(result);
                 // TODO: similar to above
+                newDay = true;
             }
 
             DayPlan dayPlan = new DayPlan(i, contents);

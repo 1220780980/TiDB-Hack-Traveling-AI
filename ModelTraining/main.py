@@ -173,10 +173,11 @@ best_model.fit(X_train, y_train)
 filename = "models/random_forest_model.joblib"
 joblib.dump(best_model, filename)
 
-# pipeline = PMMLPipeline([("model", RandomForestClassifier(**best_params))])
-# pipeline.fit(X_train, y_train)
-# filename = "models/random_forest_model.pmml"
+pipeline = PMMLPipeline([("model", RandomForestClassifier(**best_params))])
+pipeline.fit(X_train, y_train)
+filename = "models/random_forest_model.pmml"
 # sklearn2pmml(pipeline, filename, with_repr=True)
+# print(pipeline.predict(X_valid))
 # print(1)
 
 # knn
@@ -199,10 +200,11 @@ best_knn_classifier.fit(X_train, y_train)
 filename = "models/knn_model.joblib"
 joblib.dump(best_knn_classifier, filename)
 
-# pipeline = PMMLPipeline([("model", KNeighborsClassifier(n_neighbors=best_n_neighbors))])
-# pipeline.fit(X_train, y_train)
-# filename = "models/knn_model.pmml"
+pipeline = PMMLPipeline([("model", KNeighborsClassifier(n_neighbors=best_n_neighbors))])
+pipeline.fit(X_train, y_train)
+filename = "models/knn_model.pmml"
 # sklearn2pmml(pipeline, filename, with_repr=True)
+# print(pipeline.predict(X_valid))
 # print(1)
 
 # svm
@@ -232,5 +234,6 @@ joblib.dump(best_svm_classifier, filename)
 pipeline = PMMLPipeline([("model", SVC(C=best_C, kernel=best_kernel))])
 pipeline.fit(X_train, y_train)
 filename = "models/svm_model.pmml"
-sklearn2pmml(pipeline, filename, with_repr=True)
-print(1)
+# sklearn2pmml(pipeline, filename, with_repr=True)
+# print(pipeline.predict(X_valid))
+# print(1)
