@@ -67,66 +67,63 @@ public class TripadvisorController {
 
         List<DayPlan> dayPlanList = new ArrayList<>();
         boolean newDay = true;
-        List<Content> contents = new ArrayList<>();
+        Attraction bestAttraction = null;
+        List<Content> contents;
+        int timeLeft = Integer.parseInt(dailyHours) * 60;
+        String path = System.getProperty("user.dir") + "/backend/src/main/java/com/example/tripadvisor/trained";
+        Model decision_tree = Model.fromFile(path + "/decision_tree_model.pmml");
+        Model logistic_regression = Model.fromFile(path + "/logistic_regression_model.pmml");
+        Model random_forest = Model.fromFile(path + "/random_forest_model.pmml");
+        Model svm = Model.fromFile(path + "/svm_model.pmml");
+
         for (int i = 1; i <= days; i++) {
-            List<Row> rows = new ArrayList<>();
-            if (newDay) {
-                contents = new ArrayList<>();
-                for (Attraction a : attractions) {
-                    int occurrence = findTotalOccurrence(a, plans);
-                    boolean WeatherIndoorOutdoor = a.isIndoor() | weatherList.get(i - 1);
-                    Row row = new Row(a.getNum(), occurrence, 0,
-                                      Duration.ofMinutes(0), a.getRecommendDuration(),
-                                      WeatherIndoorOutdoor);
-                    rows.add(row);
+            contents = new ArrayList<>();
+
+            while (timeLeft > 0) {
+                List<Row> rows = new ArrayList<>();
+
+                if (newDay) {
+                    for (Attraction a : attractions) {
+                        int occurrence = findTotalOccurrence(a, plans);
+                        boolean WeatherIndoorOutdoor = a.isIndoor() | weatherList.get(i - 1);
+                        Row row = new Row(a.getNum(), occurrence, 0,
+                                Duration.ofMinutes(0), a.getRecommendDuration(),
+                                WeatherIndoorOutdoor);
+                        rows.add(row);
+                    }
+                    int best = findBestAttractionNewDay(rows);
+                    bestAttraction = findAttraction(attractions, best);
+                    contents.add(bestAttraction);
+                    Attraction finalBestAttraction = bestAttraction;
+                    attractions.removeIf(a -> finalBestAttraction.getNum() == a.getNum());
+                    timeLeft -= (int) bestAttraction.getRecommendDuration().toMinutes();
+                    newDay = false;
+                } else {
+                    for (Attraction a : attractions) {
+                        int occurrence = findTotalOccurrence(a, plans);
+                        int neighbourTimes = findNeighbourTimes(a, bestAttraction, plans);
+                        Duration transportationTime = findTransportationTime(a, bestAttraction, transportations);
+                        boolean WeatherIndoorOutdoor = a.isIndoor() | weatherList.get(i - 1);
+                        Row row = new Row(a.getNum(), occurrence, neighbourTimes,
+                                transportationTime, a.getRecommendDuration(),
+                                WeatherIndoorOutdoor);
+                        rows.add(row);
+                    }
+
+                    // TODO
+                    timeLeft -= 100;
+
+//                Map<String, Object> result = decision_tree.predict(new HashMap<String, Object>() {{
+//                    put("total_occurrence", 0.8);
+//                    put("neighbour_occurrence", 0.7);
+//                    put("transportation_time", 10.0);
+//                }});
+//                System.out.println(result);
                 }
-                int best = findBestAttractionNewDay(rows);
-                Attraction bestAttraction = findAttraction(attractions, best);
-                contents.add(bestAttraction);
-                attractions.removeIf(a -> bestAttraction.getNum() == a.getNum());
-                newDay = false;
-            } else {
-                String path = System.getProperty("user.dir") + "/backend/src/main/java/com/example/tripadvisor/trained";
-                Model decision_tree = Model.fromFile(path + "/decision_tree_model.pmml");
-                Model knn = Model.fromFile(path + "/knn_model.pmml");
-                Model logistic_regression = Model.fromFile(path + "/logistic_regression_model.pmml");
-                Model random_forest = Model.fromFile(path + "/random_forest_model.pmml");
-                Model svm = Model.fromFile(path + "/svm_model.pmml");
-                String[] inputNames = decision_tree.inputNames();
-                Map<String, Object> result = decision_tree.predict(new HashMap<String, Object>() {{
-                    put("total_occurrence", 0.8);
-                    put("neighbour_occurrence", 0.7);
-                    put("transportation_time", 10.0);
-                }});
-                System.out.println(result);
-                result = knn.predict(new HashMap<String, Object>() {{
-                    put("total_occurrence", 0.8);
-                    put("neighbour_occurrence", 0.7);
-                    put("transportation_time", 10.0);
-                }});
-                System.out.println(result);
-                result = logistic_regression.predict(new HashMap<String, Object>() {{
-                    put("total_occurrence", 0.8);
-                    put("neighbour_occurrence", 0.7);
-                    put("transportation_time", 10.0);
-                }});
-                System.out.println(result);
-                result = random_forest.predict(new HashMap<String, Object>() {{
-                    put("total_occurrence", 0.8);
-                    put("neighbour_occurrence", 0.7);
-                    put("transportation_time", 10.0);
-                }});
-                System.out.println(result);
-                result = svm.predict(new HashMap<String, Object>() {{
-                    put("total_occurrence", 0.8);
-                    put("neighbour_occurrence", 0.7);
-                    put("transportation_time", 10.0);
-                }});
-                System.out.println(result);
-                // TODO: similar to above
-                newDay = true;
             }
 
+            newDay = true;
+            timeLeft = Integer.parseInt(dailyHours) * 60;
             DayPlan dayPlan = new DayPlan(i, contents);
             dayPlanList.add(dayPlan);
         }
@@ -134,6 +131,43 @@ public class TripadvisorController {
         ResultPlan resultPlan = new ResultPlan(dayPlanList);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultPlan);
+    }
+
+    private Duration findTransportationTime(Attraction attraction, Attraction bestAttraction, List<Transportation> transportations) {
+        for (Transportation t : transportations) {
+            if ((t.getAttraction1() == attraction.getNum()) && (t.getAttraction2() == bestAttraction.getNum())) {
+                return t.getDuration();
+            }
+            if ((t.getAttraction2() == attraction.getNum()) && (t.getAttraction1() == bestAttraction.getNum())) {
+                return t.getDuration();
+            }
+        }
+        return null;
+    }
+
+    private int findNeighbourTimes(Attraction attraction, Attraction bestAttraction, List<JSONObject> plans) {
+        int count = 0;
+        for (JSONObject plan : plans) {
+            for (String key : plan.keySet()) {
+                JSONArray jsonArray = plan.getJSONArray(key);
+                int index1 = -10;
+                int index2 = -10;
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    if (attraction.getNum() == jsonArray.getInt(i)) {
+                        index1 = i;
+                    }
+                }
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    if (bestAttraction.getNum() == jsonArray.getInt(i)) {
+                        index2 = i;
+                    }
+                }
+                if ((index1 == index2 + 1) || (index1 == index2 - 1)) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private Attraction findAttraction(List<Attraction> attractions, int best) {
