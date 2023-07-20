@@ -6,6 +6,7 @@ import com.example.tripadvisor.dataAccessObject.TransportationGetter;
 import com.example.tripadvisor.model.*;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -91,12 +92,15 @@ public class TripadvisorController {
                                 WeatherIndoorOutdoor);
                         rows.add(row);
                     }
-                    int best = findBestAttractionNewDay(rows);
+                    int best = findBestAttractionNewDay(rows, timeLeft, attractions);
                     bestAttraction = findAttraction(attractions, best);
+                    if (bestAttraction == null) {
+                        break;
+                    }
                     contents.add(bestAttraction);
                     Attraction finalBestAttraction = bestAttraction;
                     attractions.removeIf(a -> finalBestAttraction.getNum() == a.getNum());
-                    timeLeft -= (int) bestAttraction.getRecommendDuration().toMinutes();
+                    timeLeft = timeLeft - (int) bestAttraction.getRecommendDuration().toMinutes();
                     newDay = false;
                 } else {
                     for (Attraction a : attractions) {
@@ -109,16 +113,20 @@ public class TripadvisorController {
                                 WeatherIndoorOutdoor);
                         rows.add(row);
                     }
-
-                    // TODO
-                    timeLeft -= 100;
-
-//                Map<String, Object> result = decision_tree.predict(new HashMap<String, Object>() {{
-//                    put("total_occurrence", 0.8);
-//                    put("neighbour_occurrence", 0.7);
-//                    put("transportation_time", 10.0);
-//                }});
-//                System.out.println(result);
+                    int best = findBestAttraction(rows, plans.size(), decision_tree, logistic_regression, random_forest, svm,
+                            attractions, bestAttraction, transportations, timeLeft);
+                    Attraction nextBestAttraction = findAttraction(attractions, best);
+                    if (nextBestAttraction == null) {
+                        break;
+                    }
+                    Transportation transportation = findTransportation(bestAttraction, nextBestAttraction, transportations);
+                    Transport transport = new Transport(transportation.getDetail(), bestAttraction.getName(), nextBestAttraction.getName(), transportation.getDuration());
+                    contents.add(transport);
+                    contents.add(nextBestAttraction);
+                    attractions.removeIf(a -> nextBestAttraction.getNum() == a.getNum());
+                    timeLeft = timeLeft - (int) nextBestAttraction.getRecommendDuration().toMinutes();
+                    timeLeft = timeLeft - (int) transportation.getDuration().toMinutes();
+                    bestAttraction = nextBestAttraction;
                 }
             }
 
@@ -131,6 +139,114 @@ public class TripadvisorController {
         ResultPlan resultPlan = new ResultPlan(dayPlanList);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultPlan);
+    }
+
+    private Transportation findTransportation(Attraction bestAttraction, Attraction nextBestAttraction, List<Transportation> transportations) {
+        for (Transportation t : transportations) {
+            if ((t.getAttraction1() == nextBestAttraction.getNum()) && (t.getAttraction2() == bestAttraction.getNum())) {
+                return t;
+            }
+            if ((t.getAttraction2() == nextBestAttraction.getNum()) && (t.getAttraction1() == bestAttraction.getNum())) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    private int findBestAttraction(List<Row> rows, int size, Model decisionTree, Model logisticRegression, Model randomForest, Model svm,
+                                   List<Attraction> attractions, Attraction bestAttraction, List<Transportation> transportations, int timeLeft) {
+        int largestScore = -1;
+        int best = -1;
+        Row bestRow = null;
+        for (Row r : rows) {
+            int temp = timeLeft;
+            Attraction nextBestAttraction = findAttraction(attractions, r.getAttractions());
+            Transportation transportation = findTransportation(bestAttraction, nextBestAttraction, transportations);
+            temp = temp - (int) nextBestAttraction.getRecommendDuration().toMinutes();
+            temp = temp - (int) transportation.getDuration().toMinutes();
+            if (temp < 0) {
+                continue;
+            }
+            HashMap<String, Object> input = new HashMap<String, Object>() {{
+                put("total_occurrence", (float) r.getTotalOccurrence() / (float) size);
+                put("neighbour_occurrence", (float) r.getOccurrenceNextToLast() / (float) r.getTotalOccurrence());
+                put("transportation_time", r.getTransportationTime().toMinutes());
+            }};
+            int decisionTree_result = getPredictedValue(decisionTree.predict(input));
+            int logisticRegression_result = getPredictedValue(logisticRegression.predict(input));
+            int randomForest_result = getPredictedValue(randomForest.predict(input));
+            long svm_result = (long) svm.predict(input).get("predicted_score");
+
+            int score = vote(decisionTree_result, logisticRegression_result, randomForest_result, (int) svm_result);
+            if (!r.getWeatherIndoorOutdoor()) {
+                score = score - 1;
+            }
+            if (score > largestScore) {
+                largestScore = score;
+                best = r.getAttractions();
+                bestRow = r;
+            } else if (score == largestScore) {
+                Row attraction = findAttractionInRows(rows, best);
+                if (r.getTransportationTime().toMinutes() < attraction.getTransportationTime().toMinutes()) {
+                    best = r.getAttractions();
+                    bestRow = r;
+                } else if (r.getTransportationTime().toMinutes() == attraction.getTransportationTime().toMinutes()) {
+                    if (r.getTotalOccurrence() > attraction.getTotalOccurrence()) {
+                        best = r.getAttractions();
+                        bestRow = r;
+                    }
+                }
+            }
+        }
+        rows.remove(bestRow);
+        return best;
+    }
+
+    private int vote(int num1, int num2, int num3, int num4) {
+        if (num1 != num2 && num1 != num3 && num1 != num4 && num2 != num3 && num2 != num4 && num3 != num4) {
+            return (num1 + num2 + num3 + num4) / 4;
+        } else {
+            int[] nums = {num1, num2, num3, num4};
+            int maxCount = 0;
+            int mode = 0;
+
+            for (int num : nums) {
+                int count = 0;
+                for (int n : nums) {
+                    if (num == n) {
+                        count++;
+                    }
+                }
+
+                if (count > maxCount) {
+                    maxCount = count;
+                    mode = num;
+                }
+            }
+            return mode;
+        }
+    }
+
+    private Row findAttractionInRows(List<Row> rows, int bestAttraction) {
+        for (Row r : rows) {
+            if (r.getAttractions() == bestAttraction) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    private int getPredictedValue(Map<String, Object> predict) {
+        double largestProbability = -1;
+        int result = -1;
+        for (String key : predict.keySet()) {
+            double value = (double) predict.get(key);
+            if (value > largestProbability) {
+                largestProbability = value;
+                result = Integer.parseInt(key);
+            }
+        }
+        return result;
     }
 
     private Duration findTransportationTime(Attraction attraction, Attraction bestAttraction, List<Transportation> transportations) {
@@ -179,15 +295,19 @@ public class TripadvisorController {
         return null;
     }
 
-    private int findBestAttractionNewDay(List<Row> rows) {
+    private int findBestAttractionNewDay(List<Row> rows, int timeLeft, List<Attraction> attractions) {
         int largestOccurrence = 0;
         int bestAttraction = -1;
+        Row bestRow = null;
         for (Row r : rows) {
-            if (r.getWeatherIndoorOutdoor() && (r.getTotalOccurrence() > largestOccurrence)) {
+            Attraction a = findAttraction(attractions, r.getAttractions());
+            if (r.getWeatherIndoorOutdoor() && (r.getTotalOccurrence() > largestOccurrence) && (a.getRecommendDuration().toMinutes() <= timeLeft)) {
                 largestOccurrence = r.getTotalOccurrence();
                 bestAttraction = r.getAttractions();
+                bestRow = r;
             }
         }
+        rows.remove(bestRow);
         return bestAttraction;
     }
 
