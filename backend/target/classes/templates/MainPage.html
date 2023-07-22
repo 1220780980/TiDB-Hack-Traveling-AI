@@ -59,9 +59,12 @@
             <button type="button" id="submit" value="submit" onclick="submit()" onsubmit="return false">Submit</button>
             <br>
         </div>
+        <div id="resultShowing"></div>
     </div>
     </body>
     <script>
+        let flag = 1;
+
         function updateAttributes() {
             let table = document.getElementById("table").value;
             let checkboxes = document.getElementById("checkboxes");
@@ -146,16 +149,83 @@
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     let responseJson = JSON.parse(xhr.responseText);
+                    updateResultShowing(responseJson)
                     console.log(responseJson);
                 } else {
                     console.error('请求失败: ' + xhr.status);
                 }
             };
-            // xhr.onerror = function () {
-            //     alert(xhr.responseText);
-            // };
             let formData = new FormData(form);
             xhr.send(formData);
+        }
+
+        function generateRandomColor() {
+            let color;
+            if (flag === 1) {
+                color = '#5994E5';
+                flag = 2;
+            } else {
+                color = '#456DE6';
+                flag = 1;
+            }
+            return color;
+        }
+
+        function updateResultShowing(response) {
+            const resultShowingDiv = document.getElementById('resultShowing');
+            resultShowingDiv.innerHTML = '';
+
+            const maxPerRow = 6;
+
+            response.plan.forEach((plan, planIndex) => {
+                const planDiv = document.createElement('div');
+                planDiv.style.backgroundColor = 'lightblue';
+                planDiv.style.width = '97.5%';
+                planDiv.style.marginTop = '10px';
+                planDiv.style.padding = '10px';
+                planDiv.style.borderRadius = '5px';
+
+                let dayLabel = document.createElement('div');
+                dayLabel.textContent = `Day ${plan.num}`;
+                dayLabel.style.fontWeight = 'bold';
+                planDiv.appendChild(dayLabel);
+
+                let rowDiv = document.createElement('div');
+                rowDiv.style.display = 'flex';
+                rowDiv.style.flexWrap = 'wrap';
+                rowDiv.style.marginTop = '10px';
+
+                plan.plan.forEach((item, itemIndex) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.backgroundColor = generateRandomColor();
+                    itemDiv.style.flex = '0 0 calc(14% - 10px)';
+                    itemDiv.style.margin = '5px';
+                    itemDiv.style.padding = '10px';
+                    itemDiv.style.borderRadius = '5px';
+
+                    let textContent = item.name;
+                    let recommendDuration = item.recommendDuration ? item.recommendDuration.substring(2) : '';
+                    let duration = item.duration ? item.duration.substring(2) : '';
+                    textContent += recommendDuration ? `<br>${recommendDuration}` : '';
+                    textContent += duration ? `<br>${duration}` : '';
+
+                    itemDiv.innerHTML = textContent;
+
+                    rowDiv.appendChild(itemDiv);
+
+                    if ((itemIndex + 1) % maxPerRow === 0) {
+                        planDiv.appendChild(rowDiv);
+                        rowDiv = document.createElement('div');
+                        rowDiv.style.display = 'flex';
+                        rowDiv.style.flexWrap = 'wrap';
+                        rowDiv.style.marginTop = '10px';
+                    }
+                });
+
+                planDiv.appendChild(rowDiv);
+
+                resultShowingDiv.appendChild(planDiv);
+            });
         }
     </script>
 </html>
