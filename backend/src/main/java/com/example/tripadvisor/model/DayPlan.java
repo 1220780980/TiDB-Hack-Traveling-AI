@@ -4,9 +4,11 @@ import java.util.List;
 public class DayPlan {
 
     private int num;
+    private String weather;
     private List<Content> plan;
 
-    public DayPlan(int num, List<Content> plan) {
+    public DayPlan(int num, String weather, List<Content> plan) {
+        this.weather = weather;
         this.num = num;
         this.plan = plan;
     }
@@ -18,4 +20,7 @@ public class DayPlan {
     public List<Content> getPlan() {
         return plan;
     }
+
+    public String getWeather() { return weather; }
 }
+

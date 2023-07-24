@@ -62,6 +62,7 @@ public class TripadvisorController {
         Weather weather = new Weather(country, city, startDate, leaveDate);
         WeatherAPI getWeatherResult = weather.getListWeather();
         List<Boolean> weatherList = getWeatherResult.getTripWeatherGoodOrNot();
+        List<String> weathers = getWeatherResult.getTripWeather();
 
         int days = (int) ChronoUnit.DAYS.between(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE),
                                             LocalDate.parse(leaveDate, DateTimeFormatter.ISO_DATE)) + 1;
@@ -132,7 +133,7 @@ public class TripadvisorController {
 
             newDay = true;
             timeLeft = Integer.parseInt(dailyHours) * 60;
-            DayPlan dayPlan = new DayPlan(i, contents);
+            DayPlan dayPlan = new DayPlan(i, weathers.get(i - 1), contents);
             dayPlanList.add(dayPlan);
         }
 
