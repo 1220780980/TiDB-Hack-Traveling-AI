@@ -24,7 +24,7 @@
             <br>
             <div id="checkboxes"></div>
             <br>
-            <label>Only dates within in 7 days will consider forecasts.<br>All other dates will assume to be always sunny.</label>
+            <label>Only dates within in 7 days will consider weather forecasts.<br>All other dates will assume to be always sunny.</label>
             <br>
             <label>Start date:</label>
             <input type="date" id="startDate" name="dateInput">
@@ -152,7 +152,7 @@
                     updateResultShowing(responseJson)
                     console.log(responseJson);
                 } else {
-                    console.error('请求失败: ' + xhr.status);
+                    console.error("请求失败: " + xhr.status);
                 }
             };
             let formData = new FormData(form);
@@ -189,6 +189,11 @@
                 dayLabel.textContent = `Day ${plan.num}`;
                 dayLabel.style.fontWeight = 'bold';
                 planDiv.appendChild(dayLabel);
+
+                let weatherLabel = document.createElement('div');
+                weatherLabel.textContent = `Weather: ${plan.weather}`;
+                weatherLabel.style.fontWeight = 'bold';
+                planDiv.appendChild(weatherLabel);
 
                 let rowDiv = document.createElement('div');
                 rowDiv.style.display = 'flex';
