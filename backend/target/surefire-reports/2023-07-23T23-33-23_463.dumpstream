@@ -1,0 +1,5 @@
+# Created at 2023-07-23T23:33:23.659
+Boot Manifest-JAR contains absolute paths in classpath 'P:\cs348\TiDB-Hack-Traveling-AI\backend\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

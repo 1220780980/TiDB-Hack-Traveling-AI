@@ -37,13 +37,13 @@ public class TripadvisorController {
         this.transportationGetter = transportationGetter;
     }
 
-    @GetMapping(value="/MainPage")
+    @GetMapping(value="/")
     public String MainPage() {
 
         return "MainPage";
     }
 
-    @PostMapping(value="/MainPage", produces = "application/json")
+    @PostMapping(value="/", produces = "application/json")
     public ResponseEntity<ResultPlan> handlePostRequest(@RequestParam("country") String country, @RequestParam("city") String city,
                                   @RequestParam("startDate") String startDate, @RequestParam("leaveDate") String leaveDate,
                                   @RequestParam("daily") String dailyHours) {
@@ -71,7 +71,7 @@ public class TripadvisorController {
         Attraction bestAttraction = null;
         List<Content> contents;
         int timeLeft = Integer.parseInt(dailyHours) * 60;
-        String path = System.getProperty("user.dir") + "/backend/src/main/java/com/example/tripadvisor/trained";
+        String path = "/trained";
         Model decision_tree = Model.fromFile(path + "/decision_tree_model.pmml");
         Model logistic_regression = Model.fromFile(path + "/logistic_regression_model.pmml");
         Model random_forest = Model.fromFile(path + "/random_forest_model.pmml");
