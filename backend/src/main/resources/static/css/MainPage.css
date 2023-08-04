@@ -3,35 +3,98 @@ body {
     font-size: 16px;
     margin: 0;
     padding: 0;
+    background-image: url('image.webp');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 2px solid #333;
-    border-radius: 10px;
-    background-color: #f0f0f0;
+section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    /* background-color: aquamarine; */
+
+    /*background-image: url('image.webp');*/
+    /*background-repeat: no-repeat;*/
+    /*background-position: center center;*/
+    /*background-attachment: fixed;*/
+    /*background-size: cover;*/
+    /*min-height: 100vh;*/
 }
 
-header {
+.form-box {
+    position: relative;
+    width: 800px;
+    height: auto;
+    /* background-color: red; */
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*header {*/
+/*    text-align: center;*/
+/*    margin-bottom: 20px;*/
+/*}*/
+
+h1 {
+    font-size: 33px;
+    color: mediumseagreen;
     text-align: center;
-    margin-bottom: 20px;
+    /*margin-bottom: 0;*/
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    /*margin-top: 10px;*/
 }
 
-header h1 {
-    font-size: 35px;
-    margin-bottom: 0;
-}
-
-header h2 {
-    margin-top: 0;
+h2 {
+    /*margin-top: 0;*/
     font-size: 20px;
-    color: grey;
+    color: darkseagreen;
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
 }
 
 .form-section {
-    padding: 20px;
-    background-color: #ddd;
-    border-radius: 5px;
+    /*padding: 20px;*/
+    /*background-color: #ddd;*/
+    /*border-radius: 5px;*/
+    margin-top: 15%;
+    margin-left: 10%; /* Adjust the margin value as needed */
+    text-align: left; /* Align the content to the left */
+}
+
+.form-section label,
+.form-section select,
+.form-section input,
+.form-section button {
+    display: block;
+    /*margin-bottom: 10px;*/
+}
+
+.resultShowing {
+    position: absolute;
+    bottom: 0; /* Position at the bottom of the form-section */
+    left: 0;
+    width: 100%;
+    padding: 10px; /* Add padding for spacing */
+    box-sizing: border-box; /* Include padding in width calculation */
+    background-color: rgba(255, 255, 255, 0.8); /* Add a background color */
+    border-top: 1px solid #ddd; /* Add a top border for separation */
 }

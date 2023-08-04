@@ -6,17 +6,17 @@
         <link rel="stylesheet" type="text/css" href="/css/MainPage.css">
     </head>
     <body>
-    <div class="container">
-        <header>
-            <h1>Automatic Travel Planning Maker</h1>
-            <h2>Yuyang Tian, Yue Ren Zhang, Tianhong Zhou</h2>
-        </header>
+    <section>
+        <div class="form-box">
+        <h1>Automatic Travel Planning Maker</h1>
+        <h2>Yuyang Tian, Yue Ren Zhang, Tianhong Zhou</h2>
         <div class="form-section">
             <label>Country:</label>
             <div class="tabledropdown">
                 <select class="tabledropselection" id="table" onchange="updateAttributes()">
                     <option></option>
                     <option>UK</option>
+                    <option>Japan</option>
                 </select>
             </div>
             <br>
@@ -49,6 +49,7 @@
                     <option>12</option>
                 </select>
             </div>
+            <div id="resultShowing"></div>
             <form id="formSubmit" action="/templates/MainPage.html" method="POST">
                 <input type="hidden" name="country" id="countryInput">
                 <input type="hidden" name="city" id="cityInput">
@@ -59,8 +60,8 @@
             <button type="button" id="submit" value="submit" onclick="submit()" onsubmit="return false">Submit</button>
             <br>
         </div>
-        <div id="resultShowing"></div>
-    </div>
+        </div>
+    </section>
     </body>
     <script>
         let flag = 1;
@@ -91,6 +92,8 @@
             switch (table) {
                 case "UK":
                     return ["London"];
+                case "Japan":
+                    return ["Tokyo"];
                 default:
                     return [];
             }
