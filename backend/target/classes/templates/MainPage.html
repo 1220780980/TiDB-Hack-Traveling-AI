@@ -1,36 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Automatic Travel Planning Maker</title>
-        <link rel="stylesheet" type="text/css" href="/css/MainPage.css">
-    </head>
-    <body>
-    <div class="container">
-        <header>
-            <h1>Automatic Travel Planning Maker</h1>
-            <h2>Yuyang Tian, Yue Ren Zhang, Tianhong Zhou</h2>
-        </header>
+<head>
+    <meta charset="UTF-8">
+    <title>Automatic Travel Planning Maker</title>
+    <link rel="stylesheet" type="text/css" href="/css/MainPage.css">
+</head>
+<body>
+<section>
+    <div class="form-box">
+        <h1>Automatic Travel Planning Maker</h1>
+        <h2>Yuyang Tian, Yue Ren Zhang, Tianhong Zhou</h2>
         <div class="form-section">
             <label>Country:</label>
             <div class="tabledropdown">
                 <select class="tabledropselection" id="table" onchange="updateAttributes()">
                     <option></option>
                     <option>UK</option>
+                    <option>Japan</option>
                 </select>
             </div>
             <br>
             <label>City:</label>
-            <br>
             <div id="checkboxes"></div>
             <br>
             <label>Only dates within in 7 days will consider weather forecasts.<br>All other dates will assume to be always sunny.</label>
             <br>
-            <label>Start date:</label>
-            <input type="date" id="startDate" name="dateInput">
+            <div class="input-row">
+                <label for="startDate">Start date:</label>
+                <input class="date-style" type="date" id="startDate" name="dateInput">
+            </div>
             <br>
-            <label>Leave date:</label>
-            <input type="date" id="leaveDate" name="dateInput">
+            <div class="input-row">
+                <label for="leaveDate">Leave date:</label>
+                <input class="date-style" type="date" id="leaveDate" name="dateInput">
+            </div>
             <br>
             <label>Estimated daily travel time: (recommend to be 10 hours)</label>
             <div class="dailydropdown">
@@ -49,6 +52,7 @@
                     <option>12</option>
                 </select>
             </div>
+            <br>
             <form id="formSubmit" action="/templates/MainPage.html" method="POST">
                 <input type="hidden" name="country" id="countryInput">
                 <input type="hidden" name="city" id="cityInput">
@@ -56,151 +60,165 @@
                 <input type="hidden" name="leaveDate" id="leaveDateInput">
                 <input type="hidden" name="daily" id="dailyInput">
             </form>
-            <button type="button" id="submit" value="submit" onclick="submit()" onsubmit="return false">Submit</button>
+            <button class="button-style" type="button" id="submit" value="submit" onclick="submit()" onsubmit="return false">Submit</button>
+            <div id="resultShowing"></div>
             <br>
         </div>
-        <div id="resultShowing"></div>
     </div>
-    </body>
-    <script>
-        let flag = 1;
+</section>
+</body>
+<script>
+    let flag = 1;
 
-        function updateAttributes() {
-            let table = document.getElementById("table").value;
-            let checkboxes = document.getElementById("checkboxes");
-            let attributes = getAttributes(table);
-            checkboxes.innerHTML = "";
+    function updateAttributes() {
+        let table = document.getElementById("table").value;
+        let checkboxes = document.getElementById("checkboxes");
+        let attributes = getAttributes(table);
+        checkboxes.innerHTML = "";
 
-            // render all checkbox for each table
-            for (let i = 0; i < attributes.length; i++) {
-                let attribute = attributes[i];
-                let checkbox = document.createElement("input");
-                checkbox.type = "radio";
-                checkbox.name = "attribute";
-                checkbox.value = attribute;
-                let label = document.createElement("label");
-                label.appendChild(document.createTextNode(attribute));
-                checkboxes.appendChild(checkbox);
-                checkboxes.appendChild(label);
-                checkboxes.appendChild(document.createElement("br"));
-            }
+        // render all checkbox for each table
+        for (let i = 0; i < attributes.length; i++) {
+            let attribute = attributes[i];
+            let checkbox = document.createElement("input");
+            checkbox.type = "radio";
+            checkbox.name = "attribute";
+            checkbox.value = attribute;
+            let label = document.createElement("label");
+            label.appendChild(document.createTextNode(attribute));
+
+            let radioDiv = document.createElement("div");
+            radioDiv.style.display = "flex";
+            radioDiv.style.alignItems = "center";
+            radioDiv.appendChild(checkbox);
+            radioDiv.appendChild(label);
+
+            checkboxes.appendChild(radioDiv);
+            checkboxes.appendChild(document.createElement("br"));
+        }
+    }
+
+    function getAttributes(table) {
+        // return an array of attribute names for the selected table
+        switch (table) {
+            case "UK":
+                return ["London"];
+            case "Japan":
+                return ["Tokyo"];
+            default:
+                return [];
+        }
+    }
+
+    function submit() {
+        let country = document.getElementById("table");
+        let startDate = document.getElementById("startDate");
+        let leaveDate = document.getElementById("leaveDate");
+        let dailyTime = document.getElementById("daily");
+
+        // get checked attribute
+        let result = "";
+        let radios = document.getElementsByName("attribute");
+
+        if (country.value === "") {
+            alert("You have to choose a country");
+            return;
         }
 
-        function getAttributes(table) {
-            // return an array of attribute names for the selected table
-            switch (table) {
-                case "UK":
-                    return ["London"];
-                default:
-                    return [];
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                result = radios[i].value;
+                break;
             }
         }
-
-        function submit() {
-            let country = document.getElementById("table");
-            let startDate = document.getElementById("startDate");
-            let leaveDate = document.getElementById("leaveDate");
-            let dailyTime = document.getElementById("daily");
-
-            // get checked attribute
-            let result = "";
-            let radios = document.getElementsByName("attribute");
-
-            if (country.value === "") {
-                alert("You have to choose a country");
-                return;
-            }
-
-            for (let i = 0; i < radios.length; i++) {
-                if (radios[i].checked) {
-                    result = radios[i].value;
-                    break;
-                }
-            }
-            if (result === "") {
-                alert("You have to choose a city");
-                return;
-            }
-
-            if (startDate.value === "" || leaveDate.value === "") {
-                alert("You have to choose dates");
-                return;
-            }
-
-            let date1 = new Date(startDate.value);
-            let date2 = new Date(leaveDate.value);
-            if (date1 > date2) {
-                alert("Start date must before leave date");
-                return;
-            }
-
-            let form = document.getElementById("formSubmit");
-            form.action = "";
-            form.method = "POST";
-            document.getElementById("countryInput").value = country.value;
-            document.getElementById("cityInput").value = result;
-            document.getElementById("startDateInput").value = startDate.value;
-            document.getElementById("leaveDateInput").value = leaveDate.value;
-            document.getElementById("dailyInput").value = dailyTime.value;
-
-            // send post request
-            let xhr = new XMLHttpRequest();
-            xhr.open(form.method, form.action);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    let responseJson = JSON.parse(xhr.responseText);
-                    updateResultShowing(responseJson)
-                    console.log(responseJson);
-                } else {
-                    console.error("请求失败: " + xhr.status);
-                }
-            };
-            let formData = new FormData(form);
-            xhr.send(formData);
+        if (result === "") {
+            alert("You have to choose a city");
+            return;
         }
 
-        function generateRandomColor() {
-            let color;
-            if (flag === 1) {
-                color = '#5994E5';
-                flag = 2;
+        if (startDate.value === "" || leaveDate.value === "") {
+            alert("You have to choose dates");
+            return;
+        }
+
+        let date1 = new Date(startDate.value);
+        let date2 = new Date(leaveDate.value);
+        if (date1 > date2) {
+            alert("Start date must before leave date");
+            return;
+        }
+
+        let form = document.getElementById("formSubmit");
+        form.action = "";
+        form.method = "POST";
+        document.getElementById("countryInput").value = country.value;
+        document.getElementById("cityInput").value = result;
+        document.getElementById("startDateInput").value = startDate.value;
+        document.getElementById("leaveDateInput").value = leaveDate.value;
+        document.getElementById("dailyInput").value = dailyTime.value;
+
+        // send post request
+        let xhr = new XMLHttpRequest();
+        xhr.open(form.method, form.action);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                let responseJson = JSON.parse(xhr.responseText);
+                updateResultShowing(responseJson)
+                console.log(responseJson);
             } else {
-                color = '#456DE6';
-                flag = 1;
+                console.error("请求失败: " + xhr.status);
             }
-            return color;
+        };
+        let formData = new FormData(form);
+        xhr.send(formData);
+    }
+
+    function generateRandomColor() {
+        let color;
+        if (flag === 1) {
+            color = '#5a7069';
+            flag = 2;
+        } else {
+            color = '#3e5552';
+            flag = 1;
         }
+        return color;
+    }
 
-        function updateResultShowing(response) {
-            const resultShowingDiv = document.getElementById('resultShowing');
-            resultShowingDiv.innerHTML = '';
+    function updateResultShowing(response) {
+        const resultShowingDiv = document.getElementById('resultShowing');
+        resultShowingDiv.innerHTML = '';
 
-            const maxPerRow = 6;
+        const maxPerRow = 6;
 
-            response.plan.forEach((plan, planIndex) => {
-                const planDiv = document.createElement('div');
-                planDiv.style.backgroundColor = 'lightblue';
-                planDiv.style.width = '97.5%';
-                planDiv.style.marginTop = '10px';
-                planDiv.style.padding = '10px';
-                planDiv.style.borderRadius = '5px';
+        response.plan.forEach((plan, planIndex) => {
+            const planDiv = document.createElement('div');
+            planDiv.style.backgroundColor = 'rgba(225, 218, 191, 0.5)';
+            planDiv.style.width = '760px';
+            planDiv.style.marginTop = '10px';
+            planDiv.style.padding = '10px';
+            planDiv.style.borderRadius = '5px';
+            planDiv.style.margin = '10px 10px';
 
-                let dayLabel = document.createElement('div');
-                dayLabel.textContent = `Day ${plan.num}`;
-                dayLabel.style.fontWeight = 'bold';
-                planDiv.appendChild(dayLabel);
+            let dayLabel = document.createElement('div');
+            dayLabel.textContent = `Day ${plan.num}`;
+            dayLabel.style.fontWeight = 'bold';
+            planDiv.appendChild(dayLabel);
 
-                let weatherLabel = document.createElement('div');
-                weatherLabel.textContent = `Weather: ${plan.weather}`;
-                weatherLabel.style.fontWeight = 'bold';
-                planDiv.appendChild(weatherLabel);
+            let weatherLabel = document.createElement('div');
+            weatherLabel.textContent = `Weather: ${plan.weather}`;
+            weatherLabel.style.fontWeight = 'bold';
+            planDiv.appendChild(weatherLabel);
 
+            let rowDiv = document.createElement('div');
+            rowDiv.style.display = 'flex';
+            rowDiv.style.flexWrap = 'wrap';
+            rowDiv.style.marginTop = '10px';
 
-                let rowDiv = document.createElement('div');
-                rowDiv.style.display = 'flex';
-                rowDiv.style.flexWrap = 'wrap';
-                rowDiv.style.marginTop = '10px';
-
+            if (plan.plan.length === 0) {
+                let messageDiv = document.createElement('div');
+                messageDiv.textContent = "You have visited all sights at this place!";
+                planDiv.appendChild(messageDiv);
+            } else {
                 plan.plan.forEach((item, itemIndex) => {
                     const itemDiv = document.createElement('div');
                     itemDiv.style.backgroundColor = generateRandomColor();
@@ -227,11 +245,12 @@
                         rowDiv.style.marginTop = '10px';
                     }
                 });
+            }
 
-                planDiv.appendChild(rowDiv);
+            planDiv.appendChild(rowDiv);
 
-                resultShowingDiv.appendChild(planDiv);
-            });
-        }
-    </script>
+            resultShowingDiv.appendChild(planDiv);
+        });
+    }
+</script>
 </html>

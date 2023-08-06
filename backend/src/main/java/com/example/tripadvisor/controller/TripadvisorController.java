@@ -59,10 +59,30 @@ public class TripadvisorController {
             plans.add(jsonObject);
         }
 
-        Weather weather = new Weather(country, city, startDate, leaveDate);
-        WeatherAPI getWeatherResult = weather.getListWeather();
-        List<Boolean> weatherList = getWeatherResult.getTripWeatherGoodOrNot();
-        List<String> weathers = getWeatherResult.getTripWeather();
+        List<Boolean> weatherList;
+        List<String> weathers;
+
+        try {
+            Weather weather = new Weather(country, city, startDate, leaveDate);
+            WeatherAPI getWeatherResult = weather.getListWeather();
+            weatherList = getWeatherResult.getTripWeatherGoodOrNot();
+            weathers = getWeatherResult.getTripWeather();
+        }
+        catch (Exception e) {
+            weatherList = new ArrayList<>();
+            weathers = new ArrayList<>();
+            List<LocalDate> tripDateTimes = new ArrayList<>();
+            LocalDate TripStartDate = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
+            while (!TripStartDate.isEqual(LocalDate.parse(leaveDate, DateTimeFormatter.ISO_DATE))) {
+                tripDateTimes.add(TripStartDate);
+                TripStartDate = TripStartDate.plusDays(1);
+            }
+            tripDateTimes.add(LocalDate.parse(leaveDate, DateTimeFormatter.ISO_DATE));
+            for (int i = 0; i < tripDateTimes.size(); i++) {
+                weatherList.add(true);
+                weathers.add("Sunny");
+            }
+        }
 
         int days = (int) ChronoUnit.DAYS.between(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE),
                                             LocalDate.parse(leaveDate, DateTimeFormatter.ISO_DATE)) + 1;
